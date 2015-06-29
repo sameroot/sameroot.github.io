@@ -1,0 +1,577 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.3"/>
+
+
+
+
+  <meta name="keywords" content="Hexo,next" />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.3" />
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    analytics: {
+      google: ''
+    },
+    sidebar: 'post'
+  };
+</script>
+
+
+
+
+  <title> SameRoot Blog </title>
+</head>
+
+<body>
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+  <div class="container one-column 
+   page-home 
+">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">SameRoot Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<div class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/">
+            <i class="menu-item-icon icon-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            <i class="menu-item-icon icon-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+  <div id="posts" class="posts-expand">
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/06/29/算法_排序_快速/">
+                快速排序实例
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-06-29
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h2 id="算法概述">算法概述</h2><p>1．先从数列中取出一个数作为基准数。<br>2．分区过程，将比这个数大的数全放到它的右边，小于或等于它的数全放到它的左边。<br>3．再对左右区间重复第二步，直到各区间只有一个数。</p>
+<h2 id="代码">代码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">quickSort</span><span class="params">(&amp;<span class="variable">$arr</span>, <span class="variable">$l</span>, <span class="variable">$r</span>)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$l</span> &gt;= <span class="variable">$r</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$i</span> = <span class="variable">$l</span>;</span><br><span class="line">    <span class="variable">$j</span> = <span class="variable">$r</span>;</span><br><span class="line">    <span class="variable">$flag</span> = <span class="variable">$arr</span>[<span class="variable">$l</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span> &amp;&amp; <span class="variable">$arr</span>[<span class="variable">$j</span>] &gt; <span class="variable">$flag</span>) <span class="variable">$j</span>--;</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>) <span class="variable">$arr</span>[<span class="variable">$i</span>++] = <span class="variable">$arr</span>[<span class="variable">$j</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span> &amp;&amp; <span class="variable">$arr</span>[<span class="variable">$i</span>] &lt; <span class="variable">$flag</span>) <span class="variable">$i</span>++;</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>) <span class="variable">$arr</span>[<span class="variable">$j</span>--] = <span class="variable">$arr</span>[<span class="variable">$i</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$arr</span>[<span class="variable">$i</span>] = <span class="variable">$flag</span>;</span><br><span class="line">    quickSort(<span class="variable">$arr</span>, <span class="variable">$l</span>, <span class="variable">$i</span> - <span class="number">1</span>);</span><br><span class="line">    quickSort(<span class="variable">$arr</span>, <span class="variable">$i</span> + <span class="number">1</span>, <span class="variable">$r</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="测试代码">测试代码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//test</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">veriyfy</span><span class="params">(<span class="variable">$source</span>, <span class="variable">$target</span>)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    quickSort(<span class="variable">$source</span>, <span class="number">0</span>, count(<span class="variable">$source</span>) - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="variable">$isSuccess</span> = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">foreach</span>(<span class="variable">$target</span> <span class="keyword">as</span> <span class="variable">$k</span> =&gt; <span class="variable">$v</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="keyword">isset</span>(<span class="variable">$source</span>[<span class="variable">$k</span>]) || <span class="variable">$source</span>[<span class="variable">$k</span>] != <span class="variable">$v</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$isSuccess</span> = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$isSuccess</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'.'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'x'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>();</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>();</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>(<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">6</span>);</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br></pre></td></tr></table></figure>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/06/29/算法_查找_折半_mysql/">
+                折半查找实例
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-06-29
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h2 id="需求描述">需求描述</h2><ul>
+<li>找出来某日注册的所有用户id</li>
+<li>用户表有3000w条数据，注册时间字段没有索引</li>
+<li>用户id是自增主键，遵循后注册大于先注册的规律</li>
+<li>没有交互性要求，脚本跑出来结果后存储起来即可</li>
+</ul>
+<h2 id="代码">代码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span><br><span class="line"> * 获取注册日期的后临界ids（一个在前一日，一个在后一日)</span><br><span class="line"> *</span><br><span class="line"> * <span class="doctag">@param</span> string $day</span><br><span class="line"> * <span class="doctag">@static</span></span><br><span class="line"> * <span class="doctag">@access</span> public</span><br><span class="line"> * <span class="doctag">@return</span> array</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">getBoundaryUserIdsByRegisterDay</span><span class="params">(<span class="variable">$day</span>, <span class="variable">$min</span>=null, <span class="variable">$max</span>=null)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="variable">$userTable</span> = Common::dbTableNames(<span class="string">'user'</span>);</span><br><span class="line">    <span class="variable">$boundaryUserIds</span> = <span class="keyword">array</span>(</span><br><span class="line">        <span class="number">0</span> =&gt; <span class="string">'0'</span>,</span><br><span class="line">        <span class="number">1</span> =&gt; <span class="string">'0'</span>,</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(!<span class="variable">$min</span>) <span class="variable">$min</span> = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">self</span>::_getBoundaryUserIdsAfterUserId(<span class="variable">$day</span>, <span class="variable">$min</span>, <span class="variable">$boundaryUserIds</span>) &gt;= <span class="number">0</span>) <span class="keyword">return</span> <span class="variable">$boundaryUserIds</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(!<span class="variable">$max</span>) <span class="variable">$max</span> = XDb::executeSql(<span class="variable">$userTable</span>, <span class="string">"select user_id from $userTable order by user_id desc limit 1"</span>)-&gt;current()[<span class="string">'user_id'</span>];</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">self</span>::_getBoundaryUserIdsAfterUserId(<span class="variable">$day</span>, <span class="variable">$max</span>, <span class="variable">$boundaryUserIds</span>) &lt;= <span class="number">0</span>) <span class="keyword">return</span> <span class="variable">$boundaryUserIds</span>;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$times</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="variable">$max</span> &gt; <span class="variable">$min</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        Functions::assertTure(++<span class="variable">$times</span> &lt; <span class="number">50</span>, <span class="string">"折半查找次数过多，可能有问题。day：$day"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="variable">$mid</span> = (int)((<span class="variable">$min</span> + <span class="variable">$max</span>)/<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$mid</span> == <span class="variable">$min</span> || <span class="variable">$mid</span> == <span class="variable">$max</span>) <span class="keyword">break</span>;</span><br><span class="line">        <span class="variable">$result</span> = <span class="keyword">self</span>::_getBoundaryUserIdsAfterUserId(<span class="variable">$day</span>, <span class="variable">$mid</span>, <span class="variable">$boundaryUserIds</span>);</span><br><span class="line">        <span class="keyword">if</span>(<span class="number">0</span> &gt; <span class="variable">$result</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$max</span> = <span class="variable">$mid</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(<span class="number">0</span> &lt; <span class="variable">$result</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$min</span> = <span class="variable">$mid</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$boundaryUserIds</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * 在指定用户id后查找边边界userIds</span><br><span class="line"> *</span><br><span class="line"> * <span class="doctag">@param</span> string $day</span><br><span class="line"> * <span class="doctag">@param</span> string $userId</span><br><span class="line"> * <span class="doctag">@static</span></span><br><span class="line"> * <span class="doctag">@access</span> private</span><br><span class="line"> * <span class="doctag">@return</span> int</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">_getBoundaryUserIdsAfterUserId</span><span class="params">(<span class="variable">$day</span>, <span class="variable">$userId</span>, Array &amp;<span class="variable">$boundaryUserIds</span>)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!<span class="keyword">self</span>::<span class="variable">$_UserTable</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">self</span>::<span class="variable">$_UserTable</span> = Common::dbTableNames(<span class="string">'user'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="variable">$userTable</span> = <span class="keyword">self</span>::<span class="variable">$_UserTable</span>;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$sql</span> = <span class="string">"select user_id, register_time from $userTable where user_id &gt;= $userId and register_time is not null limit 100"</span>;</span><br><span class="line">    <span class="variable">$users</span> = XDb::executeSql(<span class="variable">$userTable</span>, <span class="variable">$sql</span>)-&gt;getFetchArrays();</span><br><span class="line">    <span class="variable">$firstUser</span> = current(<span class="variable">$users</span>);</span><br><span class="line">    <span class="variable">$lastUser</span> = end(<span class="variable">$users</span>);</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$users</span>) || strtotime(<span class="variable">$firstUser</span>[<span class="string">'register_time'</span>]) &gt;= strtotime(<span class="variable">$day</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(strtotime(<span class="variable">$lastUser</span>[<span class="string">'register_time'</span>]) &lt; strtotime(<span class="variable">$day</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$cnt</span> = count(<span class="variable">$users</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="variable">$i</span>=<span class="number">1</span>; <span class="variable">$i</span>&lt;<span class="variable">$cnt</span>; <span class="variable">$i</span>++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(strtotime(<span class="variable">$users</span>[<span class="variable">$i</span>][<span class="string">'register_time'</span>]) &gt;= strtotime(<span class="variable">$day</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$boundaryUserIds</span>[<span class="number">0</span>] = <span class="variable">$users</span>[<span class="variable">$i</span>-<span class="number">1</span>][<span class="string">'user_id'</span>];</span><br><span class="line">            <span class="variable">$boundaryUserIds</span>[<span class="number">1</span>] = <span class="variable">$users</span>[<span class="variable">$i</span>][<span class="string">'user_id'</span>];</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> \<span class="keyword">Exception</span>(<span class="string">"折半查找userid的算法出问题了，day：$day, userId：$userId"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="说明">说明</h2><ul>
+<li>3000w数据约20次查找</li>
+<li>折半查找过程中每次查100条数据是为了优化性能。这里面最耗时的操作是数据库链接</li>
+<li>改成递归可能更好些</li>
+</ul>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/06/29/hadoop_安装_线上/">
+                线上安装hadoop过程
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-06-29
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h2 id="1-_检查机器是否安装jdk。如果已安装jdk，需要先把java改名">1. 检查机器是否安装jdk。如果已安装jdk，需要先把java改名</h2><pre><code>java -<span class="property">version</span>
+</code></pre><h2 id="2-安装jdk">2.安装jdk</h2><p>rpm -ivh jdk-7u79-linux-x64.rpm</p>
+<h2 id="3-安装hadoop">3.安装hadoop</h2><p>#添加hadoop用户</p>
+<pre><code>groupadd hadoop
+useradd -g hadoop hadoop
+<span class="built_in">echo</span> <span class="string">'my_passwd'</span> | passwd hadoop --stdin
+<span class="built_in">echo</span> <span class="string">'hadoop    ALL=(ALL)       NOPASSWD: /opt/install/hadoop/mybin/*'</span> &gt;&gt; /etc/sudoers
+su - hadoop -c <span class="string">'ssh-keygen -t rsa'</span>
+su - hadoop -c <span class="string">'cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys'</span>
+su - hadoop -c <span class="string">'chmod 400 ~/.ssh/authorized_keys'</span>
+</code></pre><p>#设置master到slaver的免登录</p>
+<pre><code>echo <span class="string">'ssh-rsa xxx'</span> &gt;&gt; <span class="regexp">/home/hadoop</span><span class="regexp">/.ssh/authorized</span>_keys
+</code></pre><p>#配置javahome环境变量</p>
+<pre><code>echo <span class="string">''</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
+echo <span class="string">'#java'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
+echo <span class="string">'export JAVA_HOME=/usr/java/jdk1.7.0_79'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
+echo <span class="string">'export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
+echo <span class="string">'export PATH=$PATH:$JAVA_HOME/bin'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
+</code></pre><p>#如果ssh端口号不是默认的,修改配置</p>
+<pre><code>echo <span class="string">'export HADOOP_SSH_OPTS="-p 65001"'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
+</code></pre><p>#初始化文件夹</p>
+<pre><code><span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop</span>
+<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/tmp</span>
+<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/<span class="keyword">data</span></span>
+<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/dfs</span>
+<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/dfs/name</span>
+<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/dfs/<span class="keyword">data</span></span>
+<span class="title">chown</span> -<span class="type">R</span> hadoop:hadoop /<span class="typedef"><span class="keyword">data</span>/hadoop</span>
+</code></pre><p>#安装hadoop</p>
+<pre><code>tar zxf hadoop-<span class="number">2.6</span>.0.tar.gz
+mv hadoop-<span class="number">2.6</span>.0 hadoop
+mv hadoop <span class="regexp">/opt/</span>install/
+chown -R <span class="string">hadoop:</span>hadoop <span class="regexp">/opt/</span>install<span class="regexp">/hadoop/</span>
+</code></pre><h2 id="4-master修改hosts(注意ip和机器名之间只能一个空格,且这几行位于文件最上面):">4.master修改hosts(注意ip和机器名之间只能一个空格,且这几行位于文件最上面):</h2><pre><code>10<span class="class">.168</span><span class="class">.75</span><span class="class">.110</span> <span class="tag">JRTMv2-API-1</span> <span class="id">#hadoop</span>
+10<span class="class">.168</span><span class="class">.58</span><span class="class">.215</span> <span class="tag">JRTMv2-API-2</span> <span class="id">#hadoop</span>
+10<span class="class">.168</span><span class="class">.137</span><span class="class">.6</span> <span class="tag">JRTMv2-API-3</span> <span class="id">#hadoop</span>
+</code></pre><h2 id="5-master同步hosts到slaves：">5.master同步hosts到slaves：</h2><pre><code>su hadoop - <span class="regexp">/opt/install</span><span class="regexp">/hadoop/mybin</span><span class="regexp">/h_synchro_host_client</span>
+</code></pre>
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/06/23/hello-world/">
+                Hello World
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-06-23
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick_Start">Quick Start</h2><h3 id="Create_a_new_post">Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run_server">Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate_static_files">Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+  </div>
+
+  
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="SameRoot" />
+          <p class="site-author-name">SameRoot</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">SameRoot</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.3"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.3"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.3" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+  
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+  
+
+  
+
+
+
+
+  
+  
+
+</body>
+</html>
