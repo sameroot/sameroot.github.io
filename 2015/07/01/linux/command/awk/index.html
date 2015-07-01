@@ -20,7 +20,7 @@
 
 
 
-  <meta name="keywords" content="php例子,快速排序,排序算法," />
+  <meta name="keywords" content="awk,linux," />
 
 
 
@@ -43,7 +43,7 @@
 
 
 
-  <title> 快速排序实例 // SameRoot Blog </title>
+  <title> awk范例 // SameRoot Blog </title>
 </head>
 
 <body>
@@ -138,15 +138,18 @@
           
           
             
-              快速排序实例
+              awk范例
             
           
         </h1>
       
 
       <div class="post-meta">
+          
+      </div>
+      <div class="post-meta">
         <span class="post-time">
-          发表于 2015-06-29
+          发表于 2015-07-01
         </span>
 
         
@@ -163,9 +166,7 @@
       
 
       
-        <h2 id="算法概述">算法概述</h2><p>1．先从数列中取出一个数作为基准数。<br>2．分区过程，将比这个数大的数全放到它的右边，小于或等于它的数全放到它的左边。<br>3．再对左右区间重复第二步，直到各区间只有一个数。</p>
-<h2 id="代码">代码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">quickSort</span><span class="params">(&amp;<span class="variable">$arr</span>, <span class="variable">$l</span>, <span class="variable">$r</span>)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$l</span> &gt;= <span class="variable">$r</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$i</span> = <span class="variable">$l</span>;</span><br><span class="line">    <span class="variable">$j</span> = <span class="variable">$r</span>;</span><br><span class="line">    <span class="variable">$flag</span> = <span class="variable">$arr</span>[<span class="variable">$l</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span> &amp;&amp; <span class="variable">$arr</span>[<span class="variable">$j</span>] &gt; <span class="variable">$flag</span>) <span class="variable">$j</span>--;</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>) <span class="variable">$arr</span>[<span class="variable">$i</span>++] = <span class="variable">$arr</span>[<span class="variable">$j</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span> &amp;&amp; <span class="variable">$arr</span>[<span class="variable">$i</span>] &lt; <span class="variable">$flag</span>) <span class="variable">$i</span>++;</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>) <span class="variable">$arr</span>[<span class="variable">$j</span>--] = <span class="variable">$arr</span>[<span class="variable">$i</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$arr</span>[<span class="variable">$i</span>] = <span class="variable">$flag</span>;</span><br><span class="line">    quickSort(<span class="variable">$arr</span>, <span class="variable">$l</span>, <span class="variable">$i</span> - <span class="number">1</span>);</span><br><span class="line">    quickSort(<span class="variable">$arr</span>, <span class="variable">$i</span> + <span class="number">1</span>, <span class="variable">$r</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="测试代码">测试代码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//test</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">veriyfy</span><span class="params">(<span class="variable">$source</span>, <span class="variable">$target</span>)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    quickSort(<span class="variable">$source</span>, <span class="number">0</span>, count(<span class="variable">$source</span>) - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="variable">$isSuccess</span> = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">foreach</span>(<span class="variable">$target</span> <span class="keyword">as</span> <span class="variable">$k</span> =&gt; <span class="variable">$v</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="keyword">isset</span>(<span class="variable">$source</span>[<span class="variable">$k</span>]) || <span class="variable">$source</span>[<span class="variable">$k</span>] != <span class="variable">$v</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$isSuccess</span> = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$isSuccess</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'.'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'x'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>();</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>();</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>(<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">6</span>);</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br></pre></td></tr></table></figure>
+        <h2 id="场景一(awk的group_by)">场景一(awk的group by)</h2><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">url</span>: <span class="string">http://s.jinritemai.com/front/out/page?pid=null</span></span><br><span class="line"></span><br><span class="line"><span class="gradle">nginx日志格式: <span class="number">106.39</span>.<span class="number">8.138</span> - - - - - [<span class="number">0.000</span>] - [<span class="number">01</span><span class="regexp">/Jul/</span><span class="number">2015</span>:<span class="number">11</span>:<span class="number">42</span>:<span class="number">43</span> +<span class="number">0800</span>] <span class="string">"s.jinritemai.com/front/out/page?pid=4"</span> <span class="number">302</span> <span class="number">154</span> <span class="string">"http://toutiao.com/a4545569169/"</span> <span class="string">"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36"</span> <span class="string">"121.40.71.118"</span></span><br><span class="line"></span><br><span class="line">需求: 求每个pid的访问pv、uv</span><br><span class="line"></span><br><span class="line">代码: cat <span class="regexp">/data/</span>logs<span class="regexp">/nginx/</span>lua<span class="regexp">/front/</span>out<span class="regexp">/page/</span>*.log | cut -d <span class="string">'"'</span> -f <span class="number">1</span>,<span class="number">2</span> | sed <span class="string">'s/ [^=]*=/ /g'</span> | awk <span class="string">'&#123;print $2,$1&#125;'</span> | <span class="keyword">sort</span> | uniq -c | awk <span class="string">'&#123;print $2,$1&#125;'</span> | awk <span class="string">'&#123;pv[$1]+=$2;uv[$1]+=1&#125;END&#123;for(i in pv) print i,pv[i],uv[i]&#125;'</span> | <span class="keyword">sort</span> -n</span></span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -174,11 +175,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/php例子/"> #php例子 </a>
+            <a href="/tags/awk/"> #awk </a>
           
-            <a href="/tags/快速排序/"> #快速排序 </a>
-          
-            <a href="/tags/排序算法/"> #排序算法 </a>
+            <a href="/tags/linux/"> #linux </a>
           
         </div>
       
@@ -191,7 +190,7 @@
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/06/29/算法_查找_折半_mysql/">折半查找实例</a>
+              <a href="/2015/06/29/idea/sort/quick/">快速排序实例</a>
             
           </div>
         </div>
@@ -253,7 +252,7 @@
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -267,7 +266,7 @@
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-count">21</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
@@ -291,7 +290,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#算法概述"><span class="nav-number">1.</span> <span class="nav-text">算法概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码"><span class="nav-number">2.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试代码"><span class="nav-number">3.</span> <span class="nav-text">测试代码</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#场景一(awk的group_by)"><span class="nav-number">1.</span> <span class="nav-text">场景一(awk的group by)</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
