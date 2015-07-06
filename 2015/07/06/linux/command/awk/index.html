@@ -149,7 +149,7 @@
       </div>
       <div class="post-meta">
         <span class="post-time">
-          发表于 2015-07-01
+          发表于 2015-07-06
         </span>
 
         
@@ -167,6 +167,7 @@
 
       
         <h2 id="场景一(awk的group_by)">场景一(awk的group by)</h2><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">url</span>: <span class="string">http://s.jinritemai.com/front/out/page?pid=null</span></span><br><span class="line"></span><br><span class="line"><span class="gradle">nginx日志格式: <span class="number">106.39</span>.<span class="number">8.138</span> - - - - - [<span class="number">0.000</span>] - [<span class="number">01</span><span class="regexp">/Jul/</span><span class="number">2015</span>:<span class="number">11</span>:<span class="number">42</span>:<span class="number">43</span> +<span class="number">0800</span>] <span class="string">"s.jinritemai.com/front/out/page?pid=4"</span> <span class="number">302</span> <span class="number">154</span> <span class="string">"http://toutiao.com/a4545569169/"</span> <span class="string">"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36"</span> <span class="string">"121.40.71.118"</span></span><br><span class="line"></span><br><span class="line">需求: 求每个pid的访问pv、uv</span><br><span class="line"></span><br><span class="line">代码: cat <span class="regexp">/data/</span>logs<span class="regexp">/nginx/</span>lua<span class="regexp">/front/</span>out<span class="regexp">/page/</span>*.log | cut -d <span class="string">'"'</span> -f <span class="number">1</span>,<span class="number">2</span> | sed <span class="string">'s/ [^=]*=/ /g'</span> | awk <span class="string">'&#123;print $2,$1&#125;'</span> | <span class="keyword">sort</span> | uniq -c | awk <span class="string">'&#123;print $2,$1&#125;'</span> | awk <span class="string">'&#123;pv[$1]+=$2;uv[$1]+=1&#125;END&#123;for(i in pv) print i,pv[i],uv[i]&#125;'</span> | <span class="keyword">sort</span> -n</span></span><br></pre></td></tr></table></figure>
+<h2 id="join操作">join操作</h2><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代码：awk 'NR==FNR&#123;a[<span class="label">$1</span>]=<span class="label">$2</span>;&#125;NR!=FNR &amp;&amp; a[<span class="label">$1</span>]&#123;<span class="keyword">print</span> <span class="label">$1</span><span class="string">","</span>a[<span class="label">$1</span>]<span class="string">","</span><span class="label">$2</span><span class="string">","</span><span class="label">$3&#125;</span>' file1 file2</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -292,7 +293,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#场景一(awk的group_by)"><span class="nav-number">1.</span> <span class="nav-text">场景一(awk的group by)</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#场景一(awk的group_by)"><span class="nav-number">1.</span> <span class="nav-text">场景一(awk的group by)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#join操作"><span class="nav-number">2.</span> <span class="nav-text">join操作</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
