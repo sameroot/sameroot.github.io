@@ -20,7 +20,7 @@
 
 
 
-  <meta name="keywords" content="Hexo,next" />
+  <meta name="keywords" content="mysql,字符串函数," />
 
 
 
@@ -43,7 +43,7 @@
 
 
 
-  <title> Hello World // SameRoot Blog </title>
+  <title> mysql对url的处理 // SameRoot Blog </title>
 </head>
 
 <body>
@@ -138,7 +138,7 @@
           
           
             
-              Hello World
+              mysql对url的处理
             
           
         </h1>
@@ -149,7 +149,7 @@
       </div>
       <div class="post-meta">
         <span class="post-time">
-          发表于 2015-06-25
+          发表于 2015-08-12
         </span>
 
         
@@ -166,31 +166,32 @@
       
 
       
-        <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2><h3 id="Create_a_new_post">Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+        <h2 id="为了数据查询的方便，有些访问日志直接存储在mysql里面作为格式化的数据。而访问数据里面的url是一个棘手的问题，特别是url后面的参数：参数个数和名称、数值是千变万化的。一种做法是有张单独的url参数表，跟url本身是多对一的关系；另一种做法是url参数原模样存在一个字段内（uri和args还是存两个字段的好，因为处理起来问号会很麻烦）。第一种做法更合理，但大多数情况处理起来比较麻烦；第二种做法从参数元素角度考虑是违反第一范式的，但是大多数情况是简单并且合理的（因为大多数情况是计算总pv、uv或者某个uri的pv、uv等）。本文就是在讨论基于所有args存储为一个字符串的情况下，如何处理指定args的逻辑">为了数据查询的方便，有些访问日志直接存储在mysql里面作为格式化的数据。而访问数据里面的url是一个棘手的问题，特别是url后面的参数：参数个数和名称、数值是千变万化的。一种做法是有张单独的url参数表，跟url本身是多对一的关系；另一种做法是url参数原模样存在一个字段内（uri和args还是存两个字段的好，因为处理起来问号会很麻烦）。第一种做法更合理，但大多数情况处理起来比较麻烦；第二种做法从参数元素角度考虑是违反第一范式的，但是大多数情况是简单并且合理的（因为大多数情况是计算总pv、uv或者某个uri的pv、uv等）。本文就是在讨论基于所有args存储为一个字符串的情况下，如何处理指定args的逻辑</h2><h2 id="常见场景：某个args的条件限制">常见场景：某个args的条件限制</h2><figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">需求：url类似为“http://www.jinritemai.com/home?s_refer=tt_article”，s_refer为tt_article的pv、uv</span><br><span class="line">想法：毫无疑问，使用like</span><br><span class="line">代码：</span><br><span class="line">select</span><br><span class="line">    count(id) <span class="keyword">as</span> pv</span><br><span class="line">    , count(<span class="keyword">distinct</span>(ip)) <span class="keyword">as</span> uv</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    :page_table</span><br><span class="line">where</span><br><span class="line">    args like '%s_refer=tt_article%'</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<h2 id="常见场景：根据args里面某个值进行分组统计">常见场景：根据args里面某个值进行分组统计</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">需求：url类似为“http://www.jinritemai.com/article/index?id=870&amp;assess_channel=1&amp;login_status=1”，求每个id的pv、uv</span><br><span class="line">想法：最早想的是使用mysql的substring、locate等函数拿到id的值，然后分组。后来发现substring_index这个方法,至少能节省一半的<span class="operator"><span class="keyword">select</span>长度，而且更直观。思路是这样的：先拿到<span class="string">'id='</span>后面的部分，然后再拿到<span class="string">'&amp;'</span>前面的部分。</span><br><span class="line">代码：</span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">    substring_index(substring_index(args, <span class="string">'id='</span>, -<span class="number">1</span>), <span class="string">'&amp;'</span>, <span class="number">1</span>) <span class="keyword">as</span> articleId</span><br><span class="line">    , <span class="keyword">count</span>(id) <span class="keyword">as</span> pv</span><br><span class="line">    , <span class="keyword">count</span>(<span class="keyword">distinct</span>(ip)) <span class="keyword">as</span> uv</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    :page_table</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> articleId</span><br><span class="line"><span class="keyword">having</span> articleId &gt; <span class="number">0</span> <span class="keyword">and</span> pv &gt; <span class="number">1</span></span><br><span class="line">;</span></span><br><span class="line">备注：后面加个having是因为在线上的时候发现乱七八糟的数据会干扰查询结果。比如args包含'id=&amp;aaa=bb'，或者'id=123&amp;iid=aaa'的情况</span><br></pre></td></tr></table></figure>
 
       
     </div>
 
     <div class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/"> #mysql </a>
+          
+            <a href="/tags/字符串函数/"> #字符串函数 </a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/07/01/hadoop/install/online/">线上安装hadoop过程</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/06/linux/command/awk/">awk范例</a>
             
           </div>
         </div>
@@ -290,7 +291,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick_Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create_a_new_post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run_server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate_static_files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy_to_remote_sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为了数据查询的方便，有些访问日志直接存储在mysql里面作为格式化的数据。而访问数据里面的url是一个棘手的问题，特别是url后面的参数：参数个数和名称、数值是千变万化的。一种做法是有张单独的url参数表，跟url本身是多对一的关系；另一种做法是url参数原模样存在一个字段内（uri和args还是存两个字段的好，因为处理起来问号会很麻烦）。第一种做法更合理，但大多数情况处理起来比较麻烦；第二种做法从参数元素角度考虑是违反第一范式的，但是大多数情况是简单并且合理的（因为大多数情况是计算总pv、uv或者某个uri的pv、uv等）。本文就是在讨论基于所有args存储为一个字符串的情况下，如何处理指定args的逻辑"><span class="nav-number">1.</span> <span class="nav-text">为了数据查询的方便，有些访问日志直接存储在mysql里面作为格式化的数据。而访问数据里面的url是一个棘手的问题，特别是url后面的参数：参数个数和名称、数值是千变万化的。一种做法是有张单独的url参数表，跟url本身是多对一的关系；另一种做法是url参数原模样存在一个字段内（uri和args还是存两个字段的好，因为处理起来问号会很麻烦）。第一种做法更合理，但大多数情况处理起来比较麻烦；第二种做法从参数元素角度考虑是违反第一范式的，但是大多数情况是简单并且合理的（因为大多数情况是计算总pv、uv或者某个uri的pv、uv等）。本文就是在讨论基于所有args存储为一个字符串的情况下，如何处理指定args的逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见场景：某个args的条件限制"><span class="nav-number">2.</span> <span class="nav-text">常见场景：某个args的条件限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见场景：根据args里面某个值进行分组统计"><span class="nav-number">3.</span> <span class="nav-text">常见场景：根据args里面某个值进行分组统计</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
