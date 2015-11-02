@@ -81,33 +81,9 @@
 
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="目的：">目的：</h2><p>一般来讲，做统计是为了服务于业务。对于已经成熟的业务，可以利用统计系统出报表、出结果，根据结果去评各种指标、对业务进行调整等；对于摸索中的业务，分析数据进行方向探索、证实猜想等。</p>
-<h2 id="流程：">流程：</h2><p>统计系统的流程主要包括数据收集、数据存储、数据分析三个步骤</p>
-<ul>
-<li>数据收集是统计系统的第一个阶段。直白来讲，它要记录下来谁在什么时间干了什么。用户行为、后台操作记录、异常日志等都是数据收集的目标。</li>
-<li>数据存储是指将收集的数据格式化、集合到一块进行持久化操作。这个步骤不难，但是会决定数据分析的方式。</li>
-<li>数据分析就是在已经存储好的数据上执行各种分析操作。这里最好提供简单的方式进行数据查询，比如SQL。</li>
-</ul>
-<hr>
-<h2 id="下面以“用户行为”这种喜闻乐见的数据进行统计系统设计的探索。">下面以“用户行为”这种喜闻乐见的数据进行统计系统设计的探索。</h2><h2 id="数据收集">数据收集</h2><p>用户行为的数据包括用户加载页面、点击元素、页面下滑等。可以概括为两种，第一种是加载页面；第二种是页面事件；</p>
-<ul>
-<li>加载页面这个行为属性包括：时间戳(timestamp)、UUID(id)、上一个页面id(refer_id)、用户(user_id)、资源(uri)、参数(args)、地址(ip)、UA(user_agent)。</li>
-<li>页面事件的属性：时间戳(timestamp)、UUID(id)、页面id(page_id)、事件类型(event)、内容(content)、参数(params_json)。</li>
-</ul>
-<p>为了有个直观的概念，贴上nginx 产生的两种log：<br><figure class="highlight nsis"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">page定义：log_format stataccess '<span class="variable">$stataccess_timestamp</span> <span class="variable">$stataccess_id</span> <span class="variable">$stataccess_refer_id</span> <span class="variable">$stataccess_user_id</span> <span class="variable">$stataccess_ip</span> <span class="variable">$stataccess_uri</span> <span class="variable">$stataccess_args</span> [<span class="string">"<span class="variable">$http_user_agent</span>"</span>]'<span class="comment">;</span></span><br><span class="line">page实例：<span class="number">1446393599</span> <span class="number">207569186120151101</span> <span class="number">207468043520151101</span> <span class="number">42401282</span> <span class="number">42.90</span>.<span class="number">3.198</span> /article/index id=<span class="number">40805</span> [<span class="string">"Mozilla/5.0 (Linux; Android 4.4.4; HUAWEI Y635-CL00 Build/HuaweiY635-CL00) NetType/4g"</span>]</span><br><span class="line">event定义：log_format statevent '<span class="variable">$statevent_timestamp</span> <span class="variable">$statevent_event_id</span> <span class="variable">$statevent_access_id</span> <span class="variable">$statevent_event</span> [<span class="variable">$statevent_content</span>] <span class="variable">$statevent_params_json</span>'<span class="comment">;</span></span><br><span class="line">event实例：<span class="number">1446393600</span> <span class="number">207569186920151101</span> <span class="number">207568873920151101</span> page_stay [<span class="number">4</span> <span class="number">3298</span>] &#123;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>数据产生使用js触发。和GA等不同的是，由于是自己做的统计，直接取的cookie里面的用户id并上报，比较准确。</p>
-<p>用户行为的数据有高并发大访问量的特点，数据的收集使用nginx进行。这里经过了好多次重构，从最初的php+redis+mysql存储，变为现在的nginx+redis+mysql，即将变为纯nginx。当前用到reids主要是用来生成UUID，后来发现使用其它方法也可以生成UUID，只是不是纯数字而已。只要后续数据分析那儿重构完成，这里就可以修改为纯nginx了，性能又能提一个量级。现在全站有效pv700w，统计单台机器日访问2000W次没有压力。</p>
-<h2 id="数据存储">数据存储</h2><p>从前面数据收集可以看到，用户行为的数据量比较大。这里目前还是使用mysql持久化。过程是nginx把数据存到redis中(高并发)，crontab再把数据从redis中刷到mysql中。mysql是每天的数据存一张表、每个月存一个库。这种数据存储方式在初期确实是个好方案，因为数据量不会太大，存mysql中直接使用sql就可以查询。但是在数量日益增多的情况下，已经捉襟见肘了。瓶颈主要提现在三个地方：一个是redis往mysql里刷的时候，在访问量激增时，消费的速度还没数据产生的速度快，不得已改成了php的多进程方案，有较大的资源浪费(reids使用hash存储的)；一个是取的时候，有的数据分析需要用hadoop跑，第一步就是把数据从mysql里面导出来，每天导出数据的时候mysql都快累宕机了，基本上都得导俩小时；最后一个就是数据分析的时候，event表数据超千万了，稍微复杂点儿的sql都会超时。</p>
-<p>数据存储的重构现在大致有个思路：先把数据集中在某一台大硬盘的局域网机器上(数据收集机器在阿里云上)，压缩存储。然后上传到阿里云ODPS做一个拷贝。再上传到公司hadoop集群机器里，做一个拷贝。做这两个拷贝是因为这两个地方都支持hive甚至跑MR任务。</p>
-<h2 id="数据分析">数据分析</h2><p>当前数据分析手段五花八门，不统一。有执行SQL的，有php脚本的，有MR进程分析的，还有利用linux现成命令写shell分析的。大致分两类：实时查询和每天执行。理想情况下，应该对数据存储进行封装，管理员在不需要知道下层存储方式的情况下写SQL就能查询。开发人员在不需要知道存储方式的情况下，写stream就能执行MR(stream类型的MR兼容性更好些)。SQL方式有个比较复杂的抽象是查看SQL结果需要做成异步。</p>
-<p>这个好难，就像做出一个hue来。应该需要好长时间迭代。</p>
-
-      
-    </div>
+    
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/11/02/design/stat/summary/" data-id="cighoc94m0011pl3x99gy1mub" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/11/02/design/stat/summary/" data-id="cighrql210011143xibg9j1ij" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/统计/">统计</a></li></ul>
@@ -116,6 +92,7 @@
   </div>
   
 </article>
+
 
 
   
@@ -139,17 +116,9 @@
 
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <hr>
-<p>nginx的rewrite指令包含三个参数<br>第一个表示条件,即在uri满足什么条件的时候执行rewrite<br>第二个表示目的，可以是本站，可以是外站。支持把第一个参数正则捕获值传到第二个参数里<br>第三个表示标记，可以选择last、break、redirect(302)、permanent(301)四个值</p>
-<h2 id="第三个参数_last和break的区别">第三个参数 last和break的区别</h2><p>last 会在rewrite后继续匹配下一条location<br>break 会中断掉<br>像下面这种情况就需要用last，并且配置好location顺序<br><figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml">需求：</span><br><span class="line">    http://s.demo.com/front/collect/*?xxx=xxx&amp;xxx=xxx 是本来的url</span><br><span class="line">    后来代码重构，需要把/front/collect/loaded请求转移到/collect/page/loaded进行处理</span><br><span class="line">    其余请求转到/collect/event/*进行处理</span><br><span class="line">代码：</span><br><span class="line">    location ~ /front/collect </span><span class="expression">&#123;</span><br><span class="line">        <span class="variable">rewrite</span> <span class="variable">loaded</span>$ <span class="end-block">/collect</span><span class="end-block">/page</span><span class="end-block">/loaded last</span>;</span><br><span class="line">        <span class="variable">rewrite</span> (<span class="variable">clicked</span>|<span class="variable">lazyload</span>|<span class="variable">stayed</span>|<span class="variable">hid</span>|<span class="variable">show</span>)$ <span class="end-block">/collect</span><span class="end-block">/event</span>/$1 <span class="variable">last</span>;</span><br><span class="line">    &#125;</span><span class="xml"></span><br><span class="line"></span><br><span class="line">    location ~ /collect/page </span><span class="expression">&#123;</span><br><span class="line">            <span class="variable">content</span>_<span class="variable">by</span>_<span class="variable">lua</span>_<span class="variable">file</span> $<span class="variable">APP</span>_<span class="variable">PATH</span><span class="end-block">/StatLua</span><span class="end-block">/Public</span><span class="end-block">/Content.lua</span>;</span><br><span class="line">            <span class="variable">access</span>_<span class="variable">log</span>  <span class="end-block">/data</span><span class="end-block">/logs</span><span class="end-block">/nginx</span>/$<span class="variable">ACCESS</span>_<span class="variable">LOG</span>_<span class="variable">FILE</span> <span class="variable">stataccess</span>;</span><br><span class="line">    &#125;</span><span class="xml"></span><br><span class="line"></span><br><span class="line">    location ~ /collect/event </span><span class="expression">&#123;</span><br><span class="line">            <span class="variable">content</span>_<span class="variable">by</span>_<span class="variable">lua</span>_<span class="variable">file</span> $<span class="variable">APP</span>_<span class="variable">PATH</span><span class="end-block">/StatLua</span><span class="end-block">/Public</span><span class="end-block">/Content.lua</span>;</span><br><span class="line">            <span class="variable">access</span>_<span class="variable">log</span>  <span class="end-block">/data</span><span class="end-block">/logs</span><span class="end-block">/nginx</span>/$<span class="variable">ACCESS</span>_<span class="variable">LOG</span>_<span class="variable">FILE</span> <span class="variable">statevent</span>;</span><br><span class="line">    &#125;</span><span class="xml"></span></span><br></pre></td></tr></table></figure></p>
-<h2 id="根据变量进行rewrite">根据变量进行rewrite</h2><p>有时候会碰到这种需求：某变量为为xxx的访问重定向到别的页面<br>rewrite本身是针对uri进行重定向的，无法对后面的变量进行判断。所幸rewrite可以嵌在if块里面，而server里面的if是可以拿到本次访问中的args的<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">需求：</span><br><span class="line">    某页面的请求类似于 <span class="string">http:</span><span class="comment">//www.demo.com/detail?pid=<span class="doctag"><span class="keyword">xxx</span></span></span></span><br><span class="line">    但是有几个pid的访问请求量太大且没意义，凡是请求包含这几个pid的，都重定向到错误页</span><br><span class="line">代码：</span><br><span class="line">    location ~ / &#123;</span><br><span class="line">        <span class="keyword">if</span> ($arg_pid ~ <span class="string">"(150111113017107|150011021745259|150011071662160)"</span> ) &#123;</span><br><span class="line">            rewrite (.*) <span class="regexp">/errorpage/</span>download.html last;</span><br><span class="line">        &#125;</span><br><span class="line">        include       conf/php.conf;</span><br><span class="line">        fastcgi_param  SCRIPT_FILENAME  <span class="regexp">/path/</span>to<span class="regexp">/Public/</span>index.php;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div>
+    
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/09/23/nginx/useable/rewrite/" data-id="cighoc9470002pl3xw1f3xy6l" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/09/23/nginx/useable/rewrite/" data-id="cighrql1l0002143x5t4e5sxo" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rewrite/">rewrite</a></li></ul>
@@ -158,6 +127,7 @@
   </div>
   
 </article>
+
 
 
   
@@ -181,18 +151,9 @@
 
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="前言">前言</h2><p>为了数据查询的方便，有些访问日志直接存储在mysql里面作为格式化的数据。而访问数据里面的url是一个棘手的问题，特别是url后面的参数：参数个数和名称、数值是千变万化的。</p>
-<p>一种做法是有张单独的url参数表，跟url本身是多对一的关系；另一种做法是url参数原模样存在一个字段内（uri和args还是存两个字段的好，因为处理起来问号会很麻烦）。第一种做法更合理，但大多数情况处理起来比较麻烦；第二种做法从参数元素角度考虑是违反第一范式的，但是大多数情况是简单并且合理的（因为大多数情况是计算总pv、uv或者某个uri的pv、uv等）。</p>
-<p>本文就是在讨论基于所有args存储为一个字符串的情况下，如何处理指定args的逻辑</p>
-<h2 id="常见场景：某个args的条件限制">常见场景：某个args的条件限制</h2><figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">需求：url类似为“http://www.jinritemai.com/home?s_refer=tt_article”，s_refer为tt_article的pv、uv</span><br><span class="line">想法：毫无疑问，使用like</span><br><span class="line">代码：</span><br><span class="line">select</span><br><span class="line">    count(id) <span class="keyword">as</span> pv</span><br><span class="line">    , count(<span class="keyword">distinct</span>(ip)) <span class="keyword">as</span> uv</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    :page_table</span><br><span class="line">where</span><br><span class="line">    args like '%s_refer=tt_article%'</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
-<h2 id="常见场景：根据args里面某个值进行分组统计">常见场景：根据args里面某个值进行分组统计</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">需求：url类似为“http://www.jinritemai.com/article/index?id=870&amp;assess_channel=1&amp;login_status=1”，求每个id的pv、uv</span><br><span class="line">想法：最早想的是使用mysql的substring、locate等函数拿到id的值，然后分组。后来发现substring_index这个方法,至少能节省一半的<span class="operator"><span class="keyword">select</span>长度，而且更直观。思路是这样的：先拿到<span class="string">'id='</span>后面的部分，然后再拿到<span class="string">'&amp;'</span>前面的部分。</span><br><span class="line">代码：</span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">    substring_index(substring_index(args, <span class="string">'id='</span>, -<span class="number">1</span>), <span class="string">'&amp;'</span>, <span class="number">1</span>) <span class="keyword">as</span> articleId</span><br><span class="line">    , <span class="keyword">count</span>(id) <span class="keyword">as</span> pv</span><br><span class="line">    , <span class="keyword">count</span>(<span class="keyword">distinct</span>(ip)) <span class="keyword">as</span> uv</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    :page_table</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> articleId</span><br><span class="line"><span class="keyword">having</span> articleId &gt; <span class="number">0</span> <span class="keyword">and</span> pv &gt; <span class="number">1</span></span><br><span class="line">;</span></span><br><span class="line">备注：后面加个having是因为在线上的时候发现乱七八糟的数据会干扰查询结果。比如args包含'id=&amp;aaa=bb'，或者'id=123&amp;iid=aaa'的情况</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
+    
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/09/23/mysql/string/url/" data-id="cighoc94c0007pl3x35pljfcy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/09/23/mysql/string/url/" data-id="cighrql1p0007143xeu7ltbgm" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/字符串函数/">字符串函数</a></li></ul>
@@ -201,6 +162,7 @@
   </div>
   
 </article>
+
 
 
   
@@ -224,15 +186,9 @@
 
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="场景一(awk的group_by)">场景一(awk的group by)</h2><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">url</span>: <span class="string">http://s.jinritemai.com/front/out/page?pid=null</span></span><br><span class="line"></span><br><span class="line"><span class="gradle">nginx日志格式: <span class="number">106.39</span>.<span class="number">8.138</span> - - - - - [<span class="number">0.000</span>] - [<span class="number">01</span><span class="regexp">/Jul/</span><span class="number">2015</span>:<span class="number">11</span>:<span class="number">42</span>:<span class="number">43</span> +<span class="number">0800</span>] <span class="string">"s.jinritemai.com/front/out/page?pid=4"</span> <span class="number">302</span> <span class="number">154</span> <span class="string">"http://toutiao.com/a4545569169/"</span> <span class="string">"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36"</span> <span class="string">"121.40.71.118"</span></span><br><span class="line"></span><br><span class="line">需求: 求每个pid的访问pv、uv</span><br><span class="line"></span><br><span class="line">代码: cat <span class="regexp">/data/</span>logs<span class="regexp">/nginx/</span>lua<span class="regexp">/front/</span>out<span class="regexp">/page/</span>*.log | cut -d <span class="string">'"'</span> -f <span class="number">1</span>,<span class="number">2</span> | sed <span class="string">'s/ [^=]*=/ /g'</span> | awk <span class="string">'&#123;print $2,$1&#125;'</span> | <span class="keyword">sort</span> | uniq -c | awk <span class="string">'&#123;print $2,$1&#125;'</span> | awk <span class="string">'&#123;pv[$1]+=$2;uv[$1]+=1&#125;END&#123;for(i in pv) print i,pv[i],uv[i]&#125;'</span> | <span class="keyword">sort</span> -n</span></span><br></pre></td></tr></table></figure>
-<h2 id="join操作">join操作</h2><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代码：awk 'NR==FNR&#123;a[<span class="label">$1</span>]=<span class="label">$2</span>;&#125;NR!=FNR &amp;&amp; a[<span class="label">$1</span>]&#123;<span class="keyword">print</span> <span class="label">$1</span><span class="string">","</span>a[<span class="label">$1</span>]<span class="string">","</span><span class="label">$2</span><span class="string">","</span><span class="label">$3&#125;</span>' file1 file2</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
+    
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/07/06/linux/command/awk/" data-id="cighoc94d000cpl3x7hpjq6vs" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/07/06/linux/command/awk/" data-id="cighrql1r000c143x7f8wh0zr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux工具/">linux工具</a></li></ul>
@@ -241,6 +197,7 @@
   </div>
   
 </article>
+
 
 
   
@@ -264,16 +221,9 @@
 
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="算法概述">算法概述</h2><p>1．先从数列中取出一个数作为基准数。<br>2．分区过程，将比这个数大的数全放到它的右边，小于或等于它的数全放到它的左边。<br>3．再对左右区间重复第二步，直到各区间只有一个数。</p>
-<h2 id="代码">代码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">quickSort</span><span class="params">(&amp;<span class="variable">$arr</span>, <span class="variable">$l</span>, <span class="variable">$r</span>)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$l</span> &gt;= <span class="variable">$r</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$i</span> = <span class="variable">$l</span>;</span><br><span class="line">    <span class="variable">$j</span> = <span class="variable">$r</span>;</span><br><span class="line">    <span class="variable">$flag</span> = <span class="variable">$arr</span>[<span class="variable">$l</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span> &amp;&amp; <span class="variable">$arr</span>[<span class="variable">$j</span>] &gt; <span class="variable">$flag</span>) <span class="variable">$j</span>--;</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>) <span class="variable">$arr</span>[<span class="variable">$i</span>++] = <span class="variable">$arr</span>[<span class="variable">$j</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span> &amp;&amp; <span class="variable">$arr</span>[<span class="variable">$i</span>] &lt; <span class="variable">$flag</span>) <span class="variable">$i</span>++;</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$i</span> &lt; <span class="variable">$j</span>) <span class="variable">$arr</span>[<span class="variable">$j</span>--] = <span class="variable">$arr</span>[<span class="variable">$i</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$arr</span>[<span class="variable">$i</span>] = <span class="variable">$flag</span>;</span><br><span class="line">    quickSort(<span class="variable">$arr</span>, <span class="variable">$l</span>, <span class="variable">$i</span> - <span class="number">1</span>);</span><br><span class="line">    quickSort(<span class="variable">$arr</span>, <span class="variable">$i</span> + <span class="number">1</span>, <span class="variable">$r</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="测试代码">测试代码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//test</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">veriyfy</span><span class="params">(<span class="variable">$source</span>, <span class="variable">$target</span>)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    quickSort(<span class="variable">$source</span>, <span class="number">0</span>, count(<span class="variable">$source</span>) - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="variable">$isSuccess</span> = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">foreach</span>(<span class="variable">$target</span> <span class="keyword">as</span> <span class="variable">$k</span> =&gt; <span class="variable">$v</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="keyword">isset</span>(<span class="variable">$source</span>[<span class="variable">$k</span>]) || <span class="variable">$source</span>[<span class="variable">$k</span>] != <span class="variable">$v</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$isSuccess</span> = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$isSuccess</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'.'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'x'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>();</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>();</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$source</span> = <span class="keyword">array</span>(<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">6</span>);</span><br><span class="line"><span class="variable">$target</span> = <span class="keyword">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line">veriyfy(<span class="variable">$source</span>, <span class="variable">$target</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"\n"</span>;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
+    
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/07/01/idea/sort/quick/" data-id="cighoc94f000jpl3x205qe7p1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/07/01/idea/sort/quick/" data-id="cighrql1t000j143xzos3of1e" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/快速排序/">快速排序</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序/">排序</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -282,6 +232,7 @@
   </div>
   
 </article>
+
 
 
   
@@ -305,25 +256,9 @@
 
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="需求描述">需求描述</h2><ul>
-<li>找出来某日注册的所有用户id</li>
-<li>用户表有3000w条数据，注册时间字段没有索引</li>
-<li>用户id是自增主键，遵循后注册大于先注册的规律</li>
-<li>没有交互性要求，脚本跑出来结果后存储起来即可</li>
-</ul>
-<h2 id="代码">代码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span><br><span class="line"> * 获取注册日期的后临界ids（一个在前一日，一个在后一日)</span><br><span class="line"> *</span><br><span class="line"> * <span class="doctag">@param</span> string $day</span><br><span class="line"> * <span class="doctag">@static</span></span><br><span class="line"> * <span class="doctag">@access</span> public</span><br><span class="line"> * <span class="doctag">@return</span> array</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">getBoundaryUserIdsByRegisterDay</span><span class="params">(<span class="variable">$day</span>, <span class="variable">$min</span>=null, <span class="variable">$max</span>=null)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="variable">$userTable</span> = Common::dbTableNames(<span class="string">'user'</span>);</span><br><span class="line">    <span class="variable">$boundaryUserIds</span> = <span class="keyword">array</span>(</span><br><span class="line">        <span class="number">0</span> =&gt; <span class="string">'0'</span>,</span><br><span class="line">        <span class="number">1</span> =&gt; <span class="string">'0'</span>,</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(!<span class="variable">$min</span>) <span class="variable">$min</span> = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">self</span>::_getBoundaryUserIdsAfterUserId(<span class="variable">$day</span>, <span class="variable">$min</span>, <span class="variable">$boundaryUserIds</span>) &gt;= <span class="number">0</span>) <span class="keyword">return</span> <span class="variable">$boundaryUserIds</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(!<span class="variable">$max</span>) <span class="variable">$max</span> = XDb::executeSql(<span class="variable">$userTable</span>, <span class="string">"select user_id from $userTable order by user_id desc limit 1"</span>)-&gt;current()[<span class="string">'user_id'</span>];</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">self</span>::_getBoundaryUserIdsAfterUserId(<span class="variable">$day</span>, <span class="variable">$max</span>, <span class="variable">$boundaryUserIds</span>) &lt;= <span class="number">0</span>) <span class="keyword">return</span> <span class="variable">$boundaryUserIds</span>;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$times</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="variable">$max</span> &gt; <span class="variable">$min</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        Functions::assertTure(++<span class="variable">$times</span> &lt; <span class="number">50</span>, <span class="string">"折半查找次数过多，可能有问题。day：$day"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="variable">$mid</span> = (int)((<span class="variable">$min</span> + <span class="variable">$max</span>)/<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$mid</span> == <span class="variable">$min</span> || <span class="variable">$mid</span> == <span class="variable">$max</span>) <span class="keyword">break</span>;</span><br><span class="line">        <span class="variable">$result</span> = <span class="keyword">self</span>::_getBoundaryUserIdsAfterUserId(<span class="variable">$day</span>, <span class="variable">$mid</span>, <span class="variable">$boundaryUserIds</span>);</span><br><span class="line">        <span class="keyword">if</span>(<span class="number">0</span> &gt; <span class="variable">$result</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$max</span> = <span class="variable">$mid</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(<span class="number">0</span> &lt; <span class="variable">$result</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$min</span> = <span class="variable">$mid</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$boundaryUserIds</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * 在指定用户id后查找边边界userIds</span><br><span class="line"> *</span><br><span class="line"> * <span class="doctag">@param</span> string $day</span><br><span class="line"> * <span class="doctag">@param</span> string $userId</span><br><span class="line"> * <span class="doctag">@static</span></span><br><span class="line"> * <span class="doctag">@access</span> private</span><br><span class="line"> * <span class="doctag">@return</span> int</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">_getBoundaryUserIdsAfterUserId</span><span class="params">(<span class="variable">$day</span>, <span class="variable">$userId</span>, Array &amp;<span class="variable">$boundaryUserIds</span>)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!<span class="keyword">self</span>::<span class="variable">$_UserTable</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">self</span>::<span class="variable">$_UserTable</span> = Common::dbTableNames(<span class="string">'user'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="variable">$userTable</span> = <span class="keyword">self</span>::<span class="variable">$_UserTable</span>;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$sql</span> = <span class="string">"select user_id, register_time from $userTable where user_id &gt;= $userId and register_time is not null limit 100"</span>;</span><br><span class="line">    <span class="variable">$users</span> = XDb::executeSql(<span class="variable">$userTable</span>, <span class="variable">$sql</span>)-&gt;getFetchArrays();</span><br><span class="line">    <span class="variable">$firstUser</span> = current(<span class="variable">$users</span>);</span><br><span class="line">    <span class="variable">$lastUser</span> = end(<span class="variable">$users</span>);</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$users</span>) || strtotime(<span class="variable">$firstUser</span>[<span class="string">'register_time'</span>]) &gt;= strtotime(<span class="variable">$day</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(strtotime(<span class="variable">$lastUser</span>[<span class="string">'register_time'</span>]) &lt; strtotime(<span class="variable">$day</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$cnt</span> = count(<span class="variable">$users</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="variable">$i</span>=<span class="number">1</span>; <span class="variable">$i</span>&lt;<span class="variable">$cnt</span>; <span class="variable">$i</span>++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(strtotime(<span class="variable">$users</span>[<span class="variable">$i</span>][<span class="string">'register_time'</span>]) &gt;= strtotime(<span class="variable">$day</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="variable">$boundaryUserIds</span>[<span class="number">0</span>] = <span class="variable">$users</span>[<span class="variable">$i</span>-<span class="number">1</span>][<span class="string">'user_id'</span>];</span><br><span class="line">            <span class="variable">$boundaryUserIds</span>[<span class="number">1</span>] = <span class="variable">$users</span>[<span class="variable">$i</span>][<span class="string">'user_id'</span>];</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> \<span class="keyword">Exception</span>(<span class="string">"折半查找userid的算法出问题了，day：$day, userId：$userId"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="说明">说明</h2><ul>
-<li>3000w数据约20次查找</li>
-<li>折半查找过程中每次查100条数据是为了优化性能。这里面最耗时的操作是数据库链接</li>
-<li>改成递归可能更好些</li>
-</ul>
-
-      
-    </div>
+    
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/07/01/idea/search/half/" data-id="cighoc94i000qpl3xh6t1ynd1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/07/01/idea/search/half/" data-id="cighrql1w000q143xlhm4mehx" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/折半查找/">折半查找</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/查找/">查找</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
@@ -332,6 +267,7 @@
   </div>
   
 </article>
+
 
 
   
@@ -355,50 +291,9 @@
 
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="1-_检查机器是否安装jdk。如果已安装jdk，需要先把java改名">1. 检查机器是否安装jdk。如果已安装jdk，需要先把java改名</h2><pre><code>java -<span class="property">version</span>
-</code></pre><h2 id="2-安装jdk">2.安装jdk</h2><p>rpm -ivh jdk-7u79-linux-x64.rpm</p>
-<h2 id="3-安装hadoop">3.安装hadoop</h2><p>#添加hadoop用户</p>
-<pre><code>groupadd hadoop
-useradd -g hadoop hadoop
-<span class="built_in">echo</span> <span class="string">'my_passwd'</span> | passwd hadoop --stdin
-<span class="built_in">echo</span> <span class="string">'hadoop    ALL=(ALL)       NOPASSWD: /opt/install/hadoop/mybin/*'</span> &gt;&gt; /etc/sudoers
-su - hadoop -c <span class="string">'ssh-keygen -t rsa'</span>
-su - hadoop -c <span class="string">'cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys'</span>
-su - hadoop -c <span class="string">'chmod 400 ~/.ssh/authorized_keys'</span>
-</code></pre><p>#设置master到slaver的免登录</p>
-<pre><code>echo <span class="string">'ssh-rsa xxx'</span> &gt;&gt; <span class="regexp">/home/hadoop</span><span class="regexp">/.ssh/authorized</span>_keys
-</code></pre><p>#配置javahome环境变量</p>
-<pre><code>echo <span class="string">''</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
-echo <span class="string">'#java'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
-echo <span class="string">'export JAVA_HOME=/usr/java/jdk1.7.0_79'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
-echo <span class="string">'export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
-echo <span class="string">'export PATH=$PATH:$JAVA_HOME/bin'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
-</code></pre><p>#如果ssh端口号不是默认的,修改配置</p>
-<pre><code>echo <span class="string">'export HADOOP_SSH_OPTS="-p 65001"'</span> <span class="prompt">&gt;&gt; </span>/home/hadoop/.bashrc
-</code></pre><p>#初始化文件夹</p>
-<pre><code><span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop</span>
-<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/tmp</span>
-<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/<span class="keyword">data</span></span>
-<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/dfs</span>
-<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/dfs/name</span>
-<span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/hadoop/dfs/<span class="keyword">data</span></span>
-<span class="title">chown</span> -<span class="type">R</span> hadoop:hadoop /<span class="typedef"><span class="keyword">data</span>/hadoop</span>
-</code></pre><p>#安装hadoop</p>
-<pre><code>tar zxf hadoop-<span class="number">2.6</span>.0.tar.gz
-mv hadoop-<span class="number">2.6</span>.0 hadoop
-mv hadoop <span class="regexp">/opt/</span>install/
-chown -R <span class="string">hadoop:</span>hadoop <span class="regexp">/opt/</span>install<span class="regexp">/hadoop/</span>
-</code></pre><h2 id="4-master修改hosts(注意ip和机器名之间只能一个空格,且这几行位于文件最上面):">4.master修改hosts(注意ip和机器名之间只能一个空格,且这几行位于文件最上面):</h2><pre><code>10<span class="class">.168</span><span class="class">.75</span><span class="class">.110</span> <span class="tag">JRTMv2-API-1</span> <span class="id">#hadoop</span>
-10<span class="class">.168</span><span class="class">.58</span><span class="class">.215</span> <span class="tag">JRTMv2-API-2</span> <span class="id">#hadoop</span>
-10<span class="class">.168</span><span class="class">.137</span><span class="class">.6</span> <span class="tag">JRTMv2-API-3</span> <span class="id">#hadoop</span>
-</code></pre><h2 id="5-master同步hosts到slaves：">5.master同步hosts到slaves：</h2><pre><code>su hadoop - <span class="regexp">/opt/install</span><span class="regexp">/hadoop/mybin</span><span class="regexp">/h_synchro_host_client</span>
-</code></pre>
-      
-    </div>
+    
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/07/01/hadoop/install/online/" data-id="cighoc94k000wpl3xspvl9rlu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2015/07/01/hadoop/install/online/" data-id="cighrql1z000w143x95hkzfnm" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hadoop/">hadoop</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/install/">install</a></li></ul>
@@ -407,6 +302,7 @@ chown -R <span class="string">hadoop:</span>hadoop <span class="regexp">/opt/</s
   </div>
   
 </article>
+
 
 
   
