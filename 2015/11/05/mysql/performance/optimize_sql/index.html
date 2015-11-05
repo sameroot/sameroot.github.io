@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>sql性能优化 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="分析手段
+最常见分析手段就是explain了，主要看一下扫描行数、可能走的索引。
+
+有些费解的慢查询可以用profile分析，分析过程:
+123456mysql&amp;gt; set profiling = 1; #打开profilingmysql&amp;gt; 执行慢sqlmysql&amp;gt; show profiles; #查看记录好执行时间的所有记录mysql&amp;gt; show profile for q">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql性能优化">
+<meta property="og:url" content="http://yoursite.com/2015/11/05/mysql/performance/optimize_sql/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="分析手段
+最常见分析手段就是explain了，主要看一下扫描行数、可能走的索引。
+
+有些费解的慢查询可以用profile分析，分析过程:
+123456mysql&amp;gt; set profiling = 1; #打开profilingmysql&amp;gt; 执行慢sqlmysql&amp;gt; show profiles; #查看记录好执行时间的所有记录mysql&amp;gt; show profile for q">
+<meta property="og:updated_time" content="2015-11-05T11:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="sql性能优化">
+<meta name="twitter:description" content="分析手段
+最常见分析手段就是explain了，主要看一下扫描行数、可能走的索引。
+
+有些费解的慢查询可以用profile分析，分析过程:
+123456mysql&amp;gt; set profiling = 1; #打开profilingmysql&amp;gt; 执行慢sqlmysql&amp;gt; show profiles; #查看记录好执行时间的所有记录mysql&amp;gt; show profile for q">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-mysql/performance/optimize_sql" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/11/05/mysql/performance/optimize_sql/" class="article-date">
+  <time datetime="2015-11-05T11:40:28.000Z" itemprop="datePublished">2015-11-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      sql性能优化
+    </h1>
+  
+
+      </header>
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="分析手段">分析手段</h1><ul>
+<li><p>最常见分析手段就是explain了，主要看一下扫描行数、可能走的索引。</p>
+</li>
+<li><p>有些费解的慢查询可以用profile分析，分析过程:</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; <span class="built_in">set</span> profiling = <span class="number">1</span>; <span class="comment">#打开profiling</span></span><br><span class="line">mysql&gt; 执行慢sql</span><br><span class="line">mysql&gt; show profiles; <span class="comment">#查看记录好执行时间的所有记录</span></span><br><span class="line">mysql&gt; show <span class="keyword">profile</span> <span class="keyword">for</span> query <span class="number">1</span>; <span class="comment">#查看某个查询的每一步耗费时间</span></span><br><span class="line">mysql&gt; show <span class="keyword">profile</span> <span class="literal">all</span> <span class="keyword">for</span> query <span class="number">1</span>\G <span class="comment">#查看某个查询详细信息</span></span><br><span class="line">mysql&gt; <span class="built_in">set</span> profiling = <span class="number">0</span>; <span class="comment">#关闭profiling，不关也没事儿，这个开关本次终端有效</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h1 id="优化点">优化点</h1><ul>
+<li><h2 id="索引">索引</h2><p>最常见的sql优化就是加索引了。<br>最常见的慢sql就是建表的时候没做好索引，sql全表扫随着数据量的增长越来越慢。解决办法就是给有必要的字段加上索引。</p>
+</li>
+<li><h2 id="减少io(含有text字段的表)">减少io(含有text字段的表)</h2><p>有的表含有text等类型字段，存着大量的数据。这种情况下，用’select * from …’的语句一定要命中索引。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">语句A：</span><br><span class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> t_test <span class="keyword">WHERE</span> is_used=<span class="number">0</span> <span class="keyword">AND</span> type=<span class="number">2</span> <span class="keyword">limit</span> <span class="number">500</span>;</span></span><br><span class="line"></span><br><span class="line">语句B：</span><br><span class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> t_test <span class="keyword">as</span> A</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> id <span class="keyword">FROM</span> t_test <span class="keyword">WHERE</span> is_used=<span class="number">0</span> <span class="keyword">AND</span> type=<span class="number">2</span> <span class="keyword">order</span> <span class="keyword">by</span> id <span class="keyword">asc</span> <span class="keyword">limit</span> <span class="number">500</span></span><br><span class="line">) <span class="keyword">as</span> T <span class="keyword">on</span> T.id = A.id;</span></span><br><span class="line"></span><br><span class="line">注：在表t_test中，有一个content字段类型为text记录了大量数据。除了id是主键索引，没有其余索引。</span><br></pre></td></tr></table></figure>
+<p>上面两个sql显然都需要全表扫描，因为布尔类型的或者名为type这种字段的索引基本上加了也是白加，每次都是全表扫描。<br>但是B的性能比A高了n多倍。因为这种表取出来所有的字段并且全表扫描的代价太高了，时间都浪费在了频繁的io上。<br>也就是说这种表的查询如果不能命中索引，那么就用’select id from …’和’select * from xxx where id in(…’两个语句代替。</p>
+</li>
+<li><h2 id="减少io(order_by的优化)">减少io(order by的优化)</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">语句A：</span><br><span class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> t_test <span class="keyword">where</span> create_time &gt;= <span class="string">'2015-10-01'</span> <span class="keyword">order</span> <span class="keyword">by</span> id <span class="keyword">asc</span> <span class="keyword">limit</span> <span class="number">1</span>;</span></span><br><span class="line"></span><br><span class="line">语句B：</span><br><span class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> t_test <span class="keyword">where</span> create_time &gt;= <span class="string">'2015-10-01'</span> <span class="keyword">order</span> <span class="keyword">by</span> create_time <span class="keyword">asc</span> <span class="keyword">limit</span> <span class="number">1</span>;</span></span><br><span class="line"></span><br><span class="line">注：在表t_test中，id、create_time都有索引</span><br></pre></td></tr></table></figure>
+<p>一般情况下，A和B的查询结果是相同的，但是B的性能优于A。<br>因为A需要取出来符合条件的所有结果再去根据id排序，而B的所order by的字段就是查询所走索引，不需要读出所有符合where条件的数据。</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2015/11/05/mysql/performance/optimize_sql/" data-id="cigm5izmw000cax3xn3dmxq2n" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/sql性能/">sql性能</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2015/11/05/mysql/string/url/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">mysql对url的处理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/awk/">awk</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/">hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/install/">install</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux工具/">linux工具</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rewrite/">rewrite</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql性能/">sql性能</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符串函数/">字符串函数</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/快速排序/">快速排序</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/折半查找/">折半查找</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/排序/">排序</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/查找/">查找</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/算法/">算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/统计/">统计</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/awk/" style="font-size: 10px;">awk</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/install/" style="font-size: 10px;">install</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/linux工具/" style="font-size: 10px;">linux工具</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/rewrite/" style="font-size: 10px;">rewrite</a> <a href="/tags/sql性能/" style="font-size: 10px;">sql性能</a> <a href="/tags/字符串函数/" style="font-size: 10px;">字符串函数</a> <a href="/tags/快速排序/" style="font-size: 10px;">快速排序</a> <a href="/tags/折半查找/" style="font-size: 10px;">折半查找</a> <a href="/tags/排序/" style="font-size: 10px;">排序</a> <a href="/tags/查找/" style="font-size: 10px;">查找</a> <a href="/tags/算法/" style="font-size: 20px;">算法</a> <a href="/tags/统计/" style="font-size: 10px;">统计</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2015/11/05/mysql/performance/optimize_sql/">sql性能优化</a>
+          </li>
+        
+          <li>
+            <a href="/2015/11/05/mysql/string/url/">mysql对url的处理</a>
+          </li>
+        
+          <li>
+            <a href="/2015/11/02/design/stat/summary/">统计系统设计草案</a>
+          </li>
+        
+          <li>
+            <a href="/2015/09/23/nginx/useable/rewrite/">nginx的rewrite</a>
+          </li>
+        
+          <li>
+            <a href="/2015/07/06/linux/command/awk/">awk范例</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+  </div>
+</body>
+</html>
