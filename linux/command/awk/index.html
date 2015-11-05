@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Archives: 2015 | Hexo</title>
+  <title>awk范例 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/archives/2015/index.html">
+  <meta name="description" content="场景一(awk的group by)1234567url: http://s.jinritemai.com/front/out/page?pid=nullnginx日志格式: 106.39.8.138 - - - - - [0.000] - [01/Jul/2015:11:42:43 +0800] &quot;s.jinritemai.com/front/out/page?pid=4&quot; 302 154 &quot;ht">
+<meta property="og:type" content="article">
+<meta property="og:title" content="awk范例">
+<meta property="og:url" content="http://yoursite.com/linux/command/awk/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description">
+<meta property="og:description" content="场景一(awk的group by)1234567url: http://s.jinritemai.com/front/out/page?pid=nullnginx日志格式: 106.39.8.138 - - - - - [0.000] - [01/Jul/2015:11:42:43 +0800] &quot;s.jinritemai.com/front/out/page?pid=4&quot; 302 154 &quot;ht">
+<meta property="og:updated_time" content="2015-07-06T04:09:59.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
-<meta name="twitter:description">
+<meta name="twitter:title" content="awk范例">
+<meta name="twitter:description" content="场景一(awk的group by)1234567url: http://s.jinritemai.com/front/out/page?pid=nullnginx日志格式: 106.39.8.138 - - - - - [0.000] - [01/Jul/2015:11:42:43 +0800] &quot;s.jinritemai.com/front/out/page?pid=4&quot; 302 154 &quot;ht">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -59,172 +60,68 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/mysql/performance/optimize_sql/" class="archive-article-date">
-  <time datetime="2015-11-05T11:57:29.000Z" itemprop="datePublished">Nov 5</time>
+        <section id="main"><article id="post-linux/command/awk" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/linux/command/awk/" class="article-date">
+  <time datetime="2015-07-06T04:09:59.000Z" itemprop="datePublished">2015-07-06</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/mysql/performance/optimize_sql/">sql性能优化</a>
+    <h1 class="article-title" itemprop="name">
+      awk范例
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
     
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/mysql/string/url/" class="archive-article-date">
-  <time datetime="2015-11-05T10:28:43.000Z" itemprop="datePublished">Nov 5</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/mysql/string/url/">mysql对url的处理</a>
-    </h1>
-  
+        <h2 id="场景一(awk的group_by)">场景一(awk的group by)</h2><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">url</span>: <span class="string">http://s.jinritemai.com/front/out/page?pid=null</span></span><br><span class="line"></span><br><span class="line"><span class="gradle">nginx日志格式: <span class="number">106.39</span>.<span class="number">8.138</span> - - - - - [<span class="number">0.000</span>] - [<span class="number">01</span><span class="regexp">/Jul/</span><span class="number">2015</span>:<span class="number">11</span>:<span class="number">42</span>:<span class="number">43</span> +<span class="number">0800</span>] <span class="string">"s.jinritemai.com/front/out/page?pid=4"</span> <span class="number">302</span> <span class="number">154</span> <span class="string">"http://toutiao.com/a4545569169/"</span> <span class="string">"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36"</span> <span class="string">"121.40.71.118"</span></span><br><span class="line"></span><br><span class="line">需求: 求每个pid的访问pv、uv</span><br><span class="line"></span><br><span class="line">代码: cat <span class="regexp">/data/</span>logs<span class="regexp">/nginx/</span>lua<span class="regexp">/front/</span>out<span class="regexp">/page/</span>*.log | cut -d <span class="string">'"'</span> -f <span class="number">1</span>,<span class="number">2</span> | sed <span class="string">'s/ [^=]*=/ /g'</span> | awk <span class="string">'&#123;print $2,$1&#125;'</span> | <span class="keyword">sort</span> | uniq -c | awk <span class="string">'&#123;print $2,$1&#125;'</span> | awk <span class="string">'&#123;pv[$1]+=$2;uv[$1]+=1&#125;END&#123;for(i in pv) print i,pv[i],uv[i]&#125;'</span> | <span class="keyword">sort</span> -n</span></span><br></pre></td></tr></table></figure>
+<h2 id="join操作">join操作</h2><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代码：awk 'NR==FNR&#123;a[<span class="label">$1</span>]=<span class="label">$2</span>;&#125;NR!=FNR &amp;&amp; a[<span class="label">$1</span>]&#123;<span class="keyword">print</span> <span class="label">$1</span><span class="string">","</span>a[<span class="label">$1</span>]<span class="string">","</span><span class="label">$2</span><span class="string">","</span><span class="label">$3&#125;</span>' file1 file2</span><br></pre></td></tr></table></figure>
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/design/stat/summary/" class="archive-article-date">
-  <time datetime="2015-11-02T07:32:20.000Z" itemprop="datePublished">Nov 2</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/design/stat/summary/">统计系统设计草案</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
+    </div>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/nginx/useable/rewrite/" class="archive-article-date">
-  <time datetime="2015-09-23T06:02:05.000Z" itemprop="datePublished">Sep 23</time>
-</a>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/linux/command/awk/" data-id="cigm6uofd000gf43xha1kg8n7" class="article-share-link">Share</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/nginx/useable/rewrite/">nginx的rewrite</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/linux/command/awk/" class="archive-article-date">
-  <time datetime="2015-07-06T04:09:59.000Z" itemprop="datePublished">Jul 6</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/linux/command/awk/">awk范例</a>
-    </h1>
-  
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux工具/">linux工具</a></li></ul>
 
-    </header>
+    </footer>
   </div>
-</article>
   
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/idea/sort/quick/" class="archive-article-date">
-  <time datetime="2015-07-01T07:16:49.000Z" itemprop="datePublished">Jul 1</time>
-</a>
-      
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/idea/sort/quick/">快速排序实例</a>
-    </h1>
+    <a href="/nginx/useable/rewrite/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          nginx的rewrite
+        
+      </div>
+    </a>
   
+  
+    <a href="/idea/sort/quick/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">快速排序实例</div>
+    </a>
+  
+</nav>
 
-    </header>
-  </div>
+  
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/idea/search/half/" class="archive-article-date">
-  <time datetime="2015-07-01T07:16:36.000Z" itemprop="datePublished">Jul 1</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/idea/search/half/">折半查找实例</a>
-    </h1>
-  
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/hadoop/install/online/" class="archive-article-date">
-  <time datetime="2015-07-01T07:16:07.000Z" itemprop="datePublished">Jul 1</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/hadoop/install/online/">线上安装hadoop过程</a>
-    </h1>
-  
 
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
 </section>
         
           <aside id="sidebar">
